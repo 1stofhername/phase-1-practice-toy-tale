@@ -1,4 +1,4 @@
-let addToy = false;
+let addToy = false
 
 document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.querySelector("#new-toy-btn");
@@ -12,4 +12,92 @@ document.addEventListener("DOMContentLoaded", () => {
       toyFormContainer.style.display = "none";
     }
   });
+
+  const createbtn = document.querySelector('form.add-toy-form')
+  createbtn.addEventListener('submit', (event) => {
+     event.preventDefault();
+     handleAdd(event);
+     fetchToys();
+   })
+
+
+  fetchToys();
 });
+
+function fetchToys() {
+  return fetch('http://localhost:3000/toys')
+  .then(function (res){
+    return res.json()
+  })
+  .then(renderCard)}
+
+
+
+function renderCard(toys) {
+  const toyDiv = document.querySelector('#toy-collection')
+  toys.forEach(toy => {
+
+    let card = document.createElement('div');
+    let img = document.createElement('img');
+    let h2 = document.createElement('h2');
+    let p = document.createElement('p');
+    let likeBtn = document.createElement('button');
+
+    let url = toy.image;
+    let name = toy.name;
+    let likes = toy.likes;
+    let id = toy.id
+
+    toyDiv.appendChild(card);
+    card.classList.add("card");
+    card.setAttribute('id', id)
+    
+    card.appendChild(h2)
+    h2.innerHTML = name;
+    
+    card.appendChild(img);
+    img.classList.add('toy-avatar');
+    img.src = url;
+    
+    card.appendChild(p);
+    p.innerHTML = `${likes} likes`
+    
+    card.appendChild(likeBtn);
+    likeBtn.classList.add("like-btn");
+    likeBtn.innerHTML = 'like';
+
+    likeBtn.addEventListener('click', function(){
+      p.innerHTML = (likes+= 1) + ' likes';
+      fetch(`http://localhost:3000/toys/${toy.id}`, {
+        method : 'PATCH',
+        headers : {
+          'Content-Type' : 'application/JSON',
+          'Accept' : 'application/JSON'
+        },
+        body : JSON.stringify({
+          'likes' : `${likes}` 
+        })
+      })
+    })
+   })
+}
+
+function handleAdd(event){
+  let imgInput = event.target['image'].value;
+    let nameInput = event.target['name'].value;
+
+    fetch('http://localhost:3000/toys', {
+      method : 'POST',
+      headers : {
+        'Content-Type' : 'application/JSON',
+        'Accept' : 'application/JSON'
+      },
+      body : JSON.stringify({
+        "name" : nameInput,
+        "image" : imgInput,
+        "likes" : 0
+      })
+    }).then(res => console.log(stringify(res)))
+    
+    
+}
