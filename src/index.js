@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  const createbtn = document.querySelector('form.add-toy-form')
-  createbtn.addEventListener('submit', (event) => {
+  const newToyForm = document.querySelector('form.add-toy-form')
+  newToyForm.addEventListener('submit', (event) => {
      event.preventDefault();
      handleAdd(event);
-     fetchToys();
+     document.querySelector('form.add-toy-form').reset();
    })
 
 
@@ -26,17 +26,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function fetchToys() {
   return fetch('http://localhost:3000/toys')
-  .then(function (res){
-    return res.json()
-  })
-  .then(renderCard)}
+  .then(res=>res.json())
+  .then(toyData=>toyData.forEach(toy=>renderCard(toy))
+    )
+  //.then(likeHandler)
+}
 
 
 
-function renderCard(toys) {
+function renderCard(toy) {
   const toyDiv = document.querySelector('#toy-collection')
-  toys.forEach(toy => {
-
     let card = document.createElement('div');
     let img = document.createElement('img');
     let h2 = document.createElement('h2');
@@ -79,12 +78,17 @@ function renderCard(toys) {
         })
       })
     })
-   })
+   
 }
 
 function handleAdd(event){
   let imgInput = event.target['image'].value;
     let nameInput = event.target['name'].value;
+  
+    // let newToy = {
+    //   'name': nameInput,
+    //   'url' : imgInput
+    // }
 
     fetch('http://localhost:3000/toys', {
       method : 'POST',
@@ -97,7 +101,8 @@ function handleAdd(event){
         "image" : imgInput,
         "likes" : 0
       })
-    }).then(res => console.log(stringify(res)))
+    }).then(res=>res.json())
+    .then(toy=>renderCard(toy))
     
     
 }
